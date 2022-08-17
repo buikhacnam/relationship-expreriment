@@ -11,4 +11,8 @@ public interface MapStudentMSubjectMRepository extends JpaRepository<MapStudentM
     List<MapStudentMSubjectM> findByStudentMId(Long id);
 
     List<MapStudentMSubjectM> findBySubjectMId(Long id);
+
+    void deleteAllBySubjectMId(Long id);
+
+    void deleteBySubjectMId(Long id);
 }

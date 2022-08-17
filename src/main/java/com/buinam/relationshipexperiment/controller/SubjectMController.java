@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.BeanUtils;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/subject-m")
+@Transactional
 public class SubjectMController {
 
     @Autowired
@@ -50,7 +52,17 @@ public class SubjectMController {
             subjectMRepository.save(subjectM);
 
             //save many-to-many relationship in MapStudentMSubjectM table
+
+            // what if the students already in the map -> it will be double right?
             if(subjectMDTO.getStudents() != null) {
+
+                // check if this is the update action -> delete all rows that has subjectMid in mapStudentMSubjectM table:
+
+                if (subjectMDTO.getId() != null) {
+                    System.out.println("id removed: "+ subjectMDTO.getId());
+                    mapStudentMSubjectMRepository.deleteAllBySubjectMId(subjectMDTO.getId());
+                }
+
                 subjectMDTO.getStudents().forEach(studentId -> {
                     MapStudentMSubjectM mapStudentMSubjectM = new MapStudentMSubjectM();
                     mapStudentMSubjectM.setSubjectMId(subjectM.getId());
@@ -73,7 +85,7 @@ public class SubjectMController {
             List<SubjectM> subjects = subjectMRepository.findAll();
             List<SubjectMDTOFull> result = subjects.stream().map(s -> {
                 SubjectMDTOFull subjectMDTOFull = new SubjectMDTOFull();
-                BeanUtils.copyProperties(s, subjectMDTOFull, "students");
+                BeanUtils.copyProperties(s, subjectMDTOFull);
                 System.out.println("subjectMDTO: "+ subjectMDTOFull);
                 Long id = s.getId();
                 System.out.println("id "+ id);
