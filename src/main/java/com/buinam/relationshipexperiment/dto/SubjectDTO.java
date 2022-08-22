@@ -4,14 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Data
-public class StudentMDTO {
+@NoArgsConstructor
+@AllArgsConstructor
+public class SubjectDTO {
     private Long id;
     private String name;
-    private Boolean gay;
-    private List<Long> subjects;
+    private Set<Long> students = new HashSet<>();
 }
+

@@ -12,12 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/student-m")
+@Transactional
 public class StudentMController {
-
     @Autowired
     private StudentMRepository studentMRepository;
 

@@ -16,4 +16,5 @@ public class StudentM {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
+    private Boolean gay;
 }
