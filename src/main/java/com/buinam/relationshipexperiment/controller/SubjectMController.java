@@ -46,7 +46,7 @@ public class SubjectMController {
             // optional is more suitable when findById only
             Optional<SubjectM>  subjectMOptional = subjectMRepository.findById(id);
             SubjectM subjectM = subjectMOptional.orElse(new SubjectM());
-            // this will copy all properties from subjectMDTO to subjectM except id.
+            // this will copy all properties from subjectMDTO to subjectM except id.(actually it's ok to copy id)
             // but if the properties in subjectMDTO dont exist in subjectM, it will not copy them ????
             BeanUtils.copyProperties(subjectMDTO, subjectM, "id" );
             subjectMRepository.save(subjectM);
