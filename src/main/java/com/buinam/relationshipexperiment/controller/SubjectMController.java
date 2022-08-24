@@ -2,14 +2,8 @@ package com.buinam.relationshipexperiment.controller;
 
 
 import com.buinam.relationshipexperiment.dto.SubjectMDTO;
-import com.buinam.relationshipexperiment.model.MapStudentMSubjectM;
-import com.buinam.relationshipexperiment.model.MapTeacherMSubjectM;
-import com.buinam.relationshipexperiment.model.StudentM;
-import com.buinam.relationshipexperiment.model.SubjectM;
-import com.buinam.relationshipexperiment.repository.MapStudentMSubjectMRepository;
-import com.buinam.relationshipexperiment.repository.MapTeacherMSubjectMRepository;
-import com.buinam.relationshipexperiment.repository.StudentMRepository;
-import com.buinam.relationshipexperiment.repository.SubjectMRepository;
+import com.buinam.relationshipexperiment.model.*;
+import com.buinam.relationshipexperiment.repository.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,6 +32,9 @@ public class SubjectMController {
 
     @Autowired
     private MapTeacherMSubjectMRepository mapTeacherMSubjectMRepository;
+
+    @Autowired
+    private TeacherMRepository teacherMRepository;
 
     @PostMapping("/save")
     public SubjectMDTO save(@RequestBody SubjectMDTO subjectMDTO) {
@@ -95,7 +92,6 @@ public class SubjectMController {
         }
     }
 
-    //TODO: get all subjects with students enrolled
     @GetMapping("/all")
     public List<SubjectMDTOFull> getAllSubject() {
         try {
@@ -124,6 +120,19 @@ public class SubjectMController {
                     subjectMDTOFull.setStudents(studentList);
                 }
 
+                MapTeacherMSubjectM mapTeacherMSubjectM = mapTeacherMSubjectMRepository.findBySubjectMId(id);
+                if(mapTeacherMSubjectM != null) {
+                    Long teacherId = mapTeacherMSubjectM.getTeacherMId();
+
+                    // find teacher by id
+                    Optional<TeacherM> teacherMOptional = teacherMRepository.findById(teacherId);
+                    teacherMOptional.ifPresent(subjectMDTOFull::setTeacher);
+                    // INSTEAD OF:
+//                    if (teacherMOptional.isPresent()) {
+//                        subjectMDTOFull.setTeacher(teacherMOptional.get());
+//                    }
+                }
+
                 return subjectMDTOFull;
 
             }).collect(Collectors.toList());
@@ -134,22 +143,6 @@ public class SubjectMController {
         }
     }
 
-
-    @GetMapping("/test")
-    public void test() {
-        try {
-
-                List<MapStudentMSubjectM> mapStudentMSubjectList = mapStudentMSubjectMRepository.findByStudentMId(7L);
-
-                if(mapStudentMSubjectList != null) {
-                    System.out.println("mapStudentMSubjectList: " + mapStudentMSubjectList);
-                }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-//            return null;
-        }
-    }
 }
 
 
@@ -160,4 +153,5 @@ class SubjectMDTOFull {
     private Long id;
     private String name;
     private List<StudentM> students;
+    private TeacherM teacher;
 }
