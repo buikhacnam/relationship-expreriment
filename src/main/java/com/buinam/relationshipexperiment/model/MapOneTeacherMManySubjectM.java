@@ -11,7 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table
-public class MapTeacherMSubjectM {
+public class MapOneTeacherMManySubjectM {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

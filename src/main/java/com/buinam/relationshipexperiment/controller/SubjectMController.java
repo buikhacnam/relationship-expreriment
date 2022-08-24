@@ -31,7 +31,7 @@ public class SubjectMController {
     private MapStudentMSubjectMRepository mapStudentMSubjectMRepository;
 
     @Autowired
-    private MapTeacherMSubjectMRepository mapTeacherMSubjectMRepository;
+    private MapOneTeacherMManySubjectMRepository mapOneTeacherMManySubjectMRepository;
 
     @Autowired
     private TeacherMRepository teacherMRepository;
@@ -76,13 +76,13 @@ public class SubjectMController {
             // if you want to assign the subject to one teacher, you can do it here
             if(subjectMDTO.getTeacherId() != null) {
                 if(subjectMDTO.getId() != null) {
-                    mapTeacherMSubjectMRepository.deleteAllBySubjectMId(subjectMDTO.getId());
+                    mapOneTeacherMManySubjectMRepository.deleteAllBySubjectMId(subjectMDTO.getId());
                 }
 
-                MapTeacherMSubjectM mapTeacherMSubjectM = new MapTeacherMSubjectM();
-                mapTeacherMSubjectM.setSubjectMId(subjectM.getId());
-                mapTeacherMSubjectM.setTeacherMId(subjectMDTO.getTeacherId());
-                mapTeacherMSubjectMRepository.save(mapTeacherMSubjectM);
+                MapOneTeacherMManySubjectM mapOneTeacherMManySubjectM = new MapOneTeacherMManySubjectM();
+                mapOneTeacherMManySubjectM.setSubjectMId(subjectM.getId());
+                mapOneTeacherMManySubjectM.setTeacherMId(subjectMDTO.getTeacherId());
+                mapOneTeacherMManySubjectMRepository.save(mapOneTeacherMManySubjectM);
             }
 
             return subjectMDTO;
@@ -120,9 +120,9 @@ public class SubjectMController {
                     subjectMDTOFull.setStudents(studentList);
                 }
 
-                MapTeacherMSubjectM mapTeacherMSubjectM = mapTeacherMSubjectMRepository.findBySubjectMId(id);
-                if(mapTeacherMSubjectM != null) {
-                    Long teacherId = mapTeacherMSubjectM.getTeacherMId();
+                MapOneTeacherMManySubjectM mapOneTeacherMManySubjectM = mapOneTeacherMManySubjectMRepository.findBySubjectMId(id);
+                if(mapOneTeacherMManySubjectM != null) {
+                    Long teacherId = mapOneTeacherMManySubjectM.getTeacherMId();
 
                     // find teacher by id
                     Optional<TeacherM> teacherMOptional = teacherMRepository.findById(teacherId);

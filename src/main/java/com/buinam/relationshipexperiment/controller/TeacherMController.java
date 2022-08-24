@@ -1,10 +1,10 @@
 package com.buinam.relationshipexperiment.controller;
 
 import com.buinam.relationshipexperiment.dto.TeacherMDTO;
-import com.buinam.relationshipexperiment.model.MapTeacherMSubjectM;
+import com.buinam.relationshipexperiment.model.MapOneTeacherMManySubjectM;
 import com.buinam.relationshipexperiment.model.SubjectM;
 import com.buinam.relationshipexperiment.model.TeacherM;
-import com.buinam.relationshipexperiment.repository.MapTeacherMSubjectMRepository;
+import com.buinam.relationshipexperiment.repository.MapOneTeacherMManySubjectMRepository;
 import com.buinam.relationshipexperiment.repository.SubjectMRepository;
 import com.buinam.relationshipexperiment.repository.TeacherMRepository;
 import lombok.AllArgsConstructor;
@@ -27,7 +27,7 @@ public class TeacherMController {
     TeacherMRepository teacherMRepository;
 
     @Autowired
-    MapTeacherMSubjectMRepository mapTeacherMSubjectMRepository;
+    MapOneTeacherMManySubjectMRepository mapOneTeacherMManySubjectMRepository;
 
     @Autowired
     SubjectMRepository subjectMRepository;
@@ -44,10 +44,10 @@ public class TeacherMController {
             teachersM.forEach(teacherM -> {
                 TeacherMFullDTO result = new TeacherMFullDTO();
                 BeanUtils.copyProperties(teacherM, result);
-                List<MapTeacherMSubjectM> mapTeacherMSubjectMList = mapTeacherMSubjectMRepository.findByTeacherMId(teacherM.getId());
+                List<MapOneTeacherMManySubjectM> mapOneTeacherMManySubjectMList = mapOneTeacherMManySubjectMRepository.findByTeacherMId(teacherM.getId());
                 List<SubjectM> subjectMList = new ArrayList<>();
-                mapTeacherMSubjectMList.forEach(mapTeacherMSubjectM -> {
-                    Optional<SubjectM> subjectMOptional = subjectMRepository.findById(mapTeacherMSubjectM.getSubjectMId());
+                mapOneTeacherMManySubjectMList.forEach(mapOneTeacherMManySubjectM -> {
+                    Optional<SubjectM> subjectMOptional = subjectMRepository.findById(mapOneTeacherMManySubjectM.getSubjectMId());
                     if(subjectMOptional.isPresent()) {
                         subjectMList.add(subjectMOptional.get());
                     }
@@ -77,13 +77,13 @@ public class TeacherMController {
             if (teacherMDTO.getSubjectsId() != null) {
                 // if TeacherId != null -> delete all subjects of teacher before save new subjects
                 if(TeacherId != 0L) {
-                    mapTeacherMSubjectMRepository.deleteAllByTeacherMId(TeacherId);
+                    mapOneTeacherMManySubjectMRepository.deleteAllByTeacherMId(TeacherId);
                 }
                 teacherMDTO.getSubjectsId().forEach(subjectMId -> {
-                    MapTeacherMSubjectM mapTeacherMSubjectM = new MapTeacherMSubjectM();
-                    mapTeacherMSubjectM.setTeacherMId(teacherM.getId());
-                    mapTeacherMSubjectM.setSubjectMId(subjectMId);
-                    mapTeacherMSubjectMRepository.save(mapTeacherMSubjectM);
+                    MapOneTeacherMManySubjectM mapOneTeacherMManySubjectM = new MapOneTeacherMManySubjectM();
+                    mapOneTeacherMManySubjectM.setTeacherMId(teacherM.getId());
+                    mapOneTeacherMManySubjectM.setSubjectMId(subjectMId);
+                    mapOneTeacherMManySubjectMRepository.save(mapOneTeacherMManySubjectM);
                 });
             }
             return teacherMDTO;
