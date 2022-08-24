@@ -3,9 +3,11 @@ package com.buinam.relationshipexperiment.controller;
 
 import com.buinam.relationshipexperiment.dto.SubjectMDTO;
 import com.buinam.relationshipexperiment.model.MapStudentMSubjectM;
+import com.buinam.relationshipexperiment.model.MapTeacherMSubjectM;
 import com.buinam.relationshipexperiment.model.StudentM;
 import com.buinam.relationshipexperiment.model.SubjectM;
 import com.buinam.relationshipexperiment.repository.MapStudentMSubjectMRepository;
+import com.buinam.relationshipexperiment.repository.MapTeacherMSubjectMRepository;
 import com.buinam.relationshipexperiment.repository.StudentMRepository;
 import com.buinam.relationshipexperiment.repository.SubjectMRepository;
 import lombok.AllArgsConstructor;
@@ -34,6 +36,9 @@ public class SubjectMController {
     @Autowired
     private MapStudentMSubjectMRepository mapStudentMSubjectMRepository;
 
+    @Autowired
+    private MapTeacherMSubjectMRepository mapTeacherMSubjectMRepository;
+
     @PostMapping("/save")
     public SubjectMDTO save(@RequestBody SubjectMDTO subjectMDTO) {
         try {
@@ -48,7 +53,7 @@ public class SubjectMController {
             SubjectM subjectM = subjectMOptional.orElse(new SubjectM());
             // this will copy all properties from subjectMDTO to subjectM except id.(actually it's ok to copy id)
             // but if the properties in subjectMDTO dont exist in subjectM, it will not copy them ????
-            BeanUtils.copyProperties(subjectMDTO, subjectM, "id" );
+            BeanUtils.copyProperties(subjectMDTO, subjectM);
             subjectMRepository.save(subjectM);
 
             //save many-to-many relationship in MapStudentMSubjectM table
@@ -69,6 +74,18 @@ public class SubjectMController {
                     mapStudentMSubjectM.setStudentMId(studentId);
                     mapStudentMSubjectMRepository.save(mapStudentMSubjectM);
                 });
+            }
+
+            // if you want to assign the subject to one teacher, you can do it here
+            if(subjectMDTO.getTeacherId() != null) {
+                if(subjectMDTO.getId() != null) {
+                    mapTeacherMSubjectMRepository.deleteAllBySubjectMId(subjectMDTO.getId());
+                }
+
+                MapTeacherMSubjectM mapTeacherMSubjectM = new MapTeacherMSubjectM();
+                mapTeacherMSubjectM.setSubjectMId(subjectM.getId());
+                mapTeacherMSubjectM.setTeacherMId(subjectMDTO.getTeacherId());
+                mapTeacherMSubjectMRepository.save(mapTeacherMSubjectM);
             }
 
             return subjectMDTO;

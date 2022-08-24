@@ -13,4 +13,5 @@ public class SubjectMDTO {
     private Long id;
     private String name;
     private List<Long> students;
+    private Long teacherId;
 }

@@ -11,4 +11,6 @@ public interface MapTeacherMSubjectMRepository extends JpaRepository<MapTeacherM
     void deleteAllByTeacherMId(Long teacherId);
 
     List<MapTeacherMSubjectM> findByTeacherMId(Long id);
+
+    void deleteAllBySubjectMId(Long id);
 }
