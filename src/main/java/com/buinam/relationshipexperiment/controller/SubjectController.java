@@ -3,8 +3,10 @@ package com.buinam.relationshipexperiment.controller;
 import com.buinam.relationshipexperiment.dto.SubjectDTO;
 import com.buinam.relationshipexperiment.model.Student;
 import com.buinam.relationshipexperiment.model.Subject;
+import com.buinam.relationshipexperiment.model.Teacher;
 import com.buinam.relationshipexperiment.repository.StudentRepository;
 import com.buinam.relationshipexperiment.repository.SubjectRepository;
+import com.buinam.relationshipexperiment.repository.TeacherRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +24,11 @@ public class SubjectController {
     private final SubjectRepository subjectRepository;
     private final StudentRepository studentRepository;
 
+    private final TeacherRepository teacherRepository;
 
     @GetMapping("/all")
     List<Subject> getSubjects() {
+        //possible error when delete a teacher from db: Unable to find com.buinam.relationshipexperiment.model.Teacher with id 42; nested exception is javax.persistence.
         return subjectRepository.findAll();
     }
 
@@ -36,19 +40,30 @@ public class SubjectController {
             Optional<Subject> subjectOptional = subjectRepository.findById(subjectId);
             Subject subject = subjectOptional.orElse(new Subject());
             BeanUtils.copyProperties(subjectDTO, subject);
-            System.out.println(subject.getName());
-            System.out.println(subject.getEnrolledStudents());
 
+            //@manytomany with students
             if(subjectDTO.getStudents() != null) {
                 if(subjectId != 0L) {
                     // clear all elements in a hashset
                     subject.getEnrolledStudents().clear();
                 }
                 subjectDTO.getStudents().forEach(studentId -> {
-                    Student student1 = studentRepository.findById(studentId).orElseThrow(() -> new IllegalArgumentException("Student not found"));
-                    subject.enrollStudent(student1);
+                    Optional<Student> studentOptional = studentRepository.findById(studentId);
+                    if (studentOptional.isPresent()) {
+                        subject.enrollStudent(studentOptional.get());
+                    }
+
                 });
             }
+
+            //@manytoone with teacher
+            if(subjectDTO.getTeacherId() != null) {
+                Optional<Teacher> teacherOptional = teacherRepository.findById(subjectDTO.getTeacherId());
+                if(teacherOptional.isPresent()) {
+                    subject.setCoach(teacherOptional.get());
+                }
+            }
+
             return subjectRepository.save(subject);
         } catch(Exception e) {
             System.out.println(e);

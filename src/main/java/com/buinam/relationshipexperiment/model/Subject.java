@@ -38,6 +38,10 @@ public class Subject {
 //    @JsonIgnore
     private Set<Student> enrolledStudents = new HashSet<>();
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "teacher_id", referencedColumnName = "id") // use the id of the teacher
+    private Teacher coach;
+
 
     public void enrollStudent(Student student) {
         enrolledStudents.add(student);
@@ -60,6 +64,14 @@ public class Subject {
         this.name = name;
     }
 
+    public Teacher getCoach() {
+        return coach;
+    }
+
+    public void setCoach(Teacher coach) {
+        this.coach = coach;
+    }
+
     public Set<Student> getEnrolledStudents() {
         return enrolledStudents;
     }
@@ -67,5 +79,6 @@ public class Subject {
     public void setEnrolledStudents(Set<Student> enrolledStudents) {
         this.enrolledStudents = enrolledStudents;
     }
+
 
 }
