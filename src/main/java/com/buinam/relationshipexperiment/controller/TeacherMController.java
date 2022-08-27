@@ -1,12 +1,8 @@
 package com.buinam.relationshipexperiment.controller;
 
 import com.buinam.relationshipexperiment.dto.TeacherMDTO;
-import com.buinam.relationshipexperiment.model.MapOneTeacherMManySubjectM;
-import com.buinam.relationshipexperiment.model.SubjectM;
-import com.buinam.relationshipexperiment.model.TeacherM;
-import com.buinam.relationshipexperiment.repository.MapOneTeacherMManySubjectMRepository;
-import com.buinam.relationshipexperiment.repository.SubjectMRepository;
-import com.buinam.relationshipexperiment.repository.TeacherMRepository;
+import com.buinam.relationshipexperiment.model.*;
+import com.buinam.relationshipexperiment.repository.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +27,12 @@ public class TeacherMController {
 
     @Autowired
     SubjectMRepository subjectMRepository;
+
+    @Autowired
+    MapStudentMSubjectMRepository mapStudentMSubjectMRepository;
+
+    @Autowired
+    StudentMRepository studentMRepository;
 
     @GetMapping("/all")
     public List<TeacherMFullDTO> findAll() {
@@ -93,6 +95,55 @@ public class TeacherMController {
             return null;
         }
     }
+
+
+    /**
+     * /everything
+     * find all TeachersM -> convert to TeacherEveryThingDTO
+     * Loop through List<TeacherM> to find and find all subjects of each teacher
+     * Loop through List<SubjectM> and find all students of each subject
+     */
+    @GetMapping("/everything")
+    public List<TeacherEveryThingDTO> findEveryThing() {
+
+        try {
+            List<TeacherM> teachersM = teacherMRepository.findAll();
+            List<TeacherEveryThingDTO> teacherMFullDTOList = new ArrayList<>();
+            teachersM.forEach(teacherM -> {
+                TeacherEveryThingDTO result = new TeacherEveryThingDTO();
+                BeanUtils.copyProperties(teacherM, result);
+                List<MapOneTeacherMManySubjectM> mapOneTeacherMManySubjectMList = mapOneTeacherMManySubjectMRepository.findByTeacherMId(teacherM.getId());
+                List<SubjectMDTOFull> subjectMDTOFullList = new ArrayList<>();
+                mapOneTeacherMManySubjectMList.forEach(mapOneTeacherMManySubjectM -> {
+                    Optional<SubjectM> subjectMOptional = subjectMRepository.findById(mapOneTeacherMManySubjectM.getSubjectMId());
+                    if(subjectMOptional.isPresent()) {
+                        // find all students in mapStudentMSubjectM
+                        SubjectMDTOFull subjectMDTOFull = new SubjectMDTOFull();
+                        BeanUtils.copyProperties(subjectMOptional.get(), subjectMDTOFull);
+                        List<MapStudentMSubjectM> mapStudentMSubjectM = mapStudentMSubjectMRepository.findBySubjectMId(subjectMOptional.get().getId());
+                        if (mapStudentMSubjectM != null) {
+                            List<StudentM> studentMDTOList = new ArrayList<>();
+                            mapStudentMSubjectM.forEach(mapItem -> {
+                                Optional<StudentM> studentMOptional = studentMRepository.findById(mapItem.getStudentMId());
+                                if (studentMOptional.isPresent()) {
+                                    studentMDTOList.add(studentMOptional.get());
+                                }
+                            });
+                            subjectMDTOFull.setStudents(studentMDTOList);
+                            subjectMDTOFull.setTeacher(teacherM);
+                        }
+                        subjectMDTOFullList.add(subjectMDTOFull);
+                    }
+
+                } );
+                result.setSubjects(subjectMDTOFullList);
+                teacherMFullDTOList.add(result);
+            } );
+            return teacherMFullDTOList;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }
 
 
@@ -103,4 +154,13 @@ class TeacherMFullDTO {
     private Long id;
     private String name;
     private List<SubjectM> subjects;
+}
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+class TeacherEveryThingDTO {
+    private Long id;
+    private String name;
+    private List<SubjectMDTOFull> subjects;
 }
