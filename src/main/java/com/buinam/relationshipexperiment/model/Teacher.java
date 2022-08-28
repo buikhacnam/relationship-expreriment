@@ -19,8 +19,8 @@ public class Teacher {
     private Long id;
     private String name;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "coach")
+//    @JsonIgnore
+    @OneToMany(mappedBy = "coach", fetch = FetchType.LAZY)
     private Set<Subject> subjects = new HashSet<>();
 
     public Long getId() {

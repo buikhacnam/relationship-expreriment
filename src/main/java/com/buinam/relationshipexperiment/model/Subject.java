@@ -29,7 +29,7 @@ public class Subject {
     private String name;
 
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name="student_enrolled",
             joinColumns = @JoinColumn(name="subject_id"),

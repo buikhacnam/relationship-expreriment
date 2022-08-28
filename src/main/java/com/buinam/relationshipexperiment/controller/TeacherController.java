@@ -32,6 +32,13 @@ public class TeacherController {
         return teacherDTOList;
     }
 
+    @GetMapping("/all1")
+    public List<Teacher> getAllTeachers1() {
+        List<Teacher> teachers = teacherRepository.findAll();
+
+        return teachers;
+    }
+
     @PostMapping("/save")
     public Teacher createTeacher(@RequestBody  Teacher teacher) {
         System.out.println(teacher.getId());
