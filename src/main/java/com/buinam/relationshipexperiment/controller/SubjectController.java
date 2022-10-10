@@ -91,4 +91,10 @@ public class SubjectController {
 //
 //        return subjectRepository.save(subject);
 //    }
+
+    // delete subject
+    @DeleteMapping("/{subjectId}")
+    void deleteSubject(@PathVariable Long subjectId) {
+        subjectRepository.deleteById(subjectId);
+    }
 }
