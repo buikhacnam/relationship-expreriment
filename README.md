@@ -10,4 +10,13 @@ Relationship between tables:
 | `many-to-many` | `Student` and `Subject` | `StudentM` and `SubjectM` |
 | `one-to-many`  | `Teacher` and `Student` | `TeacherM` and `StudentM` |
 | `many-to-one`  | `Subject` and `Teacher` | `SubjectM` and `TeacherM` |
-| `one-to-one`   | `Library` and `Address` |                           |    
+| `one-to-one`   | `Library` and `Address` | --                        |    
+
+
+Controllers:
+
+| JPA Mapping         | Manual Mapping       |
+|---------------------|----------------------|
+| `SubjectController` | `SubjectMController` |
+| `TeacherController` | `TeacherMController` |
+| `StudentController` | `StudentMController` | 
